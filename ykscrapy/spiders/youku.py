@@ -6,6 +6,7 @@ import json
 from ..items import YkscrapyItem
 from VideoUrl import videolink
 
+import time
 class YoukuSpider(scrapy.Spider):
     name = 'youku'
     topic = ['jkjs']#,'jkjs','jsqy','sxbk','mcdb']
@@ -32,38 +33,35 @@ class YoukuSpider(scrapy.Spider):
         video = YkscrapyItem()
         video['url'] = response.url
         title_pattern = '<meta name="title" content="(.*?)" />'
-        x = re.findall(title_pattern,response.text)
+        x= re.findall(title_pattern,response.text)
         if(len(x)!=0):
             title = x[0]
         else:
             title="???"
-
         title = re.sub('[^\w\s]','',title)
         video['title'] =  title.replace(' ','_')
-
         soup = BeautifulSoup(response.text,'lxml')
-        scores = soup.select('div > h2 > span')
-        if scores == []:
-            video['score'] = '无'
-        else :
-            video['score'] = scores[0].text
-        tags = soup.find_all(class_='v-tag')
+        video['score'] = soup.select('div > h2 > span')
+    #   video['tag'] = str(soup.find_all(class_='v-tag'))
+        tags = soup.findAll(class_='v-tag')
         video['tag'] = []
         if tags == []:
             video['tag'].append('无')
         else :
             for t in tags:
                 video['tag'].append(t.text)
-        #self.tag = str(self.tag)
-        owner = soup.select('#module_basic_sub > a:nth-of-type(1)')[0].text
-        video['owner'] = owner.strip()
+        video['tag'] = " ".join(video['tag'])
+
+        video['owner'] = soup.select('#module_basic_sub > a:nth-of-type(1)')[0].text
         video['up_time']= soup.find_all(class_='bold mr3')[0].text
         vid_pattern = "videoId: '(.*?)'"
         try :
             video['vid'] = re.findall(vid_pattern,response.text)[0]
         except IndexError:
             video['vid'] ='0'
-            print(video['url']+'列表出错')
+            print("----------------------------------------%s的vid没找到----------------------------------------"%video['url'])
+            return
+
         comment_page = 'http://p.comments.youku.com/ycp/comment/pc/commentList?' \
                              'app=100-DDwODVkv&objectId=%s&listType=0' \
                             '&sign=979b304e50791fe50dc7adeaa67eee48&time=1537438670'%(video['vid'])
@@ -75,18 +73,19 @@ class YoukuSpider(scrapy.Spider):
         api_meta = json.loads(response.text)
         for item in api_meta['data']['comment']:
             comment = '#'+item['content']+'##'
-            #print(i['content'])
             comments.append(comment)
-
-        video['comments'] = comments
+        video['comments'] = str(comments)
 
         x = self.video_parse(video)
-
         yield x
 
     def video_parse(self,video):
         t = videolink(video['vid'])
-        vurls = t.api()
-        video['file_urls'] = vurls
+
+        if t.api() == False:
+            pass
+        else:
+            vurls = t.tslinks
+            video['file_urls'] = vurls
         return video
 

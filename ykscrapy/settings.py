@@ -74,8 +74,6 @@ ITEM_PIPELINES = {
     'ykscrapy.pipelines.VideoPipeline': 1,
     'ykscrapy.pipelines.YkitemPipeline': 2,
     'ykscrapy.pipelines.DBPipeline':3,
-
-    #'scrapy.pipelines.files.FilesPipeline': 1
 }
 FILES_STORE = 'C:/Users/hjw/Desktop/videos'
 
