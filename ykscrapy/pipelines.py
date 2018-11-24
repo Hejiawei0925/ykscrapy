@@ -19,7 +19,6 @@ import sys
 import pymysql
 from scrapy.conf import settings
 
-from twisted.enterprise import adbapi
 class DBPipeline():
     def process_item(self, item, spider):
         db =pymysql.connect('127.0.0.1','root','root',db='ykspider')
@@ -54,77 +53,37 @@ class DBPipeline():
 
 class YkitemPipeline():
    def process_item(self, item, spider):
+        item['owner'] = item['owner'].strip()
         settings = get_project_settings()
-        dir = settings['FILES_STORE']
+        root_dir = settings['FILES_STORE']
         try:
-            rpath = item['files'][0]['path'].split('/')[0]
+            rpath = item['files'][0]['path'].split('/')[1]
         except:
             item['path'] = '无'
             return item
-        path = dir+'/'+rpath
+
+        path = root_dir + '/' + item['dir'] +'/'+rpath
         item['path'] = path
         cmd = 'cd %s && copy /b *.ts new.mp4 && del *.ts '%(path)
         os.system(cmd)
-
-        if item['score'] == []:
-            item['score'] = '无'
-        else :
-            item['score'] = item['score'][0].text
-
-        # tags = []
-        # if item['tag'] == []:
-        #     item['tag'].append('无')
-        # else :
-        #     for t in item['tag']:
-        #         tags.append(t.text)
-        #         item['tag'].clear()
-        #         item['tag'] = tags[:]
-        #item['tag'] = str(item['tag'])
-
-        item['owner'] = item['owner'].strip()
         return item
 
 class VideoPipeline(FilesPipeline):
     def get_media_requests(self, item, info):
-        return [Request(x,meta={'title':item['title']}) for x in item.get(self.files_urls_field, [])]
+        return [Request(x,meta={
+                                'title':item['title'],
+                                'dir':item['dir'],
+                                }) for x in item.get(self.files_urls_field, [])]
 
     def file_path(self, request, response=None, info=None):
         #resquest.meta response.meta 有什么区别？
+        dir = request.meta['dir']
         new_title = request.meta['title']
         n_pattern = 'ts_seg_no=(.*?)&'
-        number = re.findall(n_pattern,request.url)[0]
-        return '%s/%s.ts' % (new_title,number)
-
-
-
-
-
-
-'''
-title
-if(len(x)!=0):
-            title = x[0]
-        else:
-            title="???"
-
-        title = re.sub('[^\w\s]','',title)
-        video['title'] =  title.replace(' ','_')
-        
-score      
-if scores == []:
-            video['score'] = '无'
+        if 'ts_seg_no=' in request.url:
+            number = re.findall(n_pattern,request.url)[0]
+            number = str(number).zfill(4)
+            return '%s/%s/%s.ts' % (dir,new_title,number)
         else :
-            video['score'] = scores[0].text   
-            
-tag         
-tags = soup.find_all(class_='v-tag')
-        video['tag'] = []
-        if tags == []:
-            video['tag'].append('无')
-        else :
-            for t in tags:
-                video['tag'].append(t.text)  
-owner                
- owner = soup.select('#module_basic_sub > a:nth-of-type(1)')[0].text
-        video['owner'] = owner.strip()   
-'''
+            return '%s/%s/%s.ts' % (dir,new_title,'1')
+

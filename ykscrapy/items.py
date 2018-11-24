@@ -12,6 +12,7 @@ class YkscrapyItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     vid = Field()
+    vid2 = Field()
     title = Field()
     url = Field()
     comments = Field()
@@ -19,6 +20,7 @@ class YkscrapyItem(scrapy.Item):
     owner = Field()
     up_time = Field()
     tag = Field()
+    dir = Field()
     path = Field()
     file_urls = Field()
     files = Field()

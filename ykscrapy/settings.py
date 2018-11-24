@@ -14,13 +14,24 @@ BOT_NAME = 'ykscrapy'
 SPIDER_MODULES = ['ykscrapy.spiders']
 NEWSPIDER_MODULE = 'ykscrapy.spiders'
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) Chrome/42.0.2311.90 Safari/537.36'
+
 DOWNLOAD_DELAY = 0.5
+ROBOTSTXT_OBEY = False
+
+ITEM_PIPELINES = {
+    'ykscrapy.pipelines.VideoPipeline': 1,
+    'ykscrapy.pipelines.YkitemPipeline': 2,
+    'ykscrapy.pipelines.DBPipeline':3,
+}
+FILES_STORE = 'C:/Users/hjw/Desktop/videos'
+
+LOG_LEVEL = 'WARNING'
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'ykscrapy (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -65,17 +76,7 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-MYSQL_DB_NAME = 'ykspider'
-MYSQL_HOST = 'localhost'
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'root'
 
-ITEM_PIPELINES = {
-    'ykscrapy.pipelines.VideoPipeline': 1,
-    'ykscrapy.pipelines.YkitemPipeline': 2,
-    'ykscrapy.pipelines.DBPipeline':3,
-}
-FILES_STORE = 'C:/Users/hjw/Desktop/videos'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
