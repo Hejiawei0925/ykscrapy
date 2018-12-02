@@ -1,6 +1,6 @@
 import pymysql
-
 import os
+
 db =pymysql.connect('127.0.0.1','root','root',db='ykspider')
 cursor = db.cursor()
 

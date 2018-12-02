@@ -4,12 +4,14 @@ from bs4 import BeautifulSoup
 import re
 import json
 from ..items import YkscrapyItem
-from vu1 import videolink
+from VideoUrl import videolink
 
 import time
 class YoukuSpider(scrapy.Spider):
     name = 'youku'
-    topic = ['jrrm','jkjs','jsqy','sxbk','mcdb']
+    # topic = ['jrrm','jkjs','jsqy','sxbk','mcdb']
+    topic = ['jrrm']#,'jkjs','jsqy','sxbk','mcdb']
+
     start_urls = ['http://news.youku.com/index/%s'%x for x in topic]
     num = 2
     MAX_PAGENUM = 2
@@ -93,18 +95,17 @@ class YoukuSpider(scrapy.Spider):
         yield x
 
     def video_parse(self,video):
-        # x = 0
         while True:
-            # print(str(x)*200)
-            # x += 1
             t = videolink(video['vid2'])
             result = t.api()
             if  result == 1:
+                #print('1'*100)
                 return video
             elif result == 2:
                 #print('cndy'*100)
-                continue
+                return
             elif result == 3:
+                #print('3'*100)
                 video['file_urls'] = t.cdn_url.split()
                 return video
             else:

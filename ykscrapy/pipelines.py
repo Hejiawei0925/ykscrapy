@@ -79,10 +79,15 @@ class VideoPipeline(FilesPipeline):
         #resquest.meta response.meta 有什么区别？
         dir = request.meta['dir']
         new_title = request.meta['title']
-        n_pattern = 'ts_seg_no=(.*?)&'
         if 'ts_seg_no=' in request.url:
+            n_pattern = 'ts_seg_no=(.*?)&'
             number = re.findall(n_pattern,request.url)[0]
-            number = str(number).zfill(4)
+            number = str(number).zfill(5)
+            return '%s/%s/%s.ts' % (dir,new_title,number)
+
+        elif '.ts?' in request.url:
+            n_pattern = '-([0-9]{5}).ts'
+            number = re.findall(n_pattern,request.url)[0]
             return '%s/%s/%s.ts' % (dir,new_title,number)
         else :
             return '%s/%s/%s.ts' % (dir,new_title,'1')

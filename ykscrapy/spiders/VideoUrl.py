@@ -1,13 +1,10 @@
 import re
-import time
 import json
-import urllib.request,urllib.parse
 import requests
-
 
 def log(func):
     def decorator(*args, **kwargs):
-        # print(func.__name__+' called')
+        #print(func.__name__+' called')
         return func(*args, **kwargs)
     return decorator
 
@@ -26,15 +23,7 @@ class videolink():
 
     @log
     def get_json_url(self):
-        ccode = '0516'
-        utid = self.cna
-        ckey = 'DIl58SLFxFNndSV1GFNnMQVYkx1PP5tKe1siZu/86PR1u/Wh1Ptd+WOZsHHWxysSfAOhNJpdVWsdVJNsfJ8Sxd8WKVvNfAS8aS8fAOzYARzPyPc3JvtnPHjTdKfESTdnuTW6ZPvk2pNDh4uFzotgdMEFkzQ5wZVXl2Pf1/Y6hLK0OnCNxBj3+nb0v72gZ6b0td+WOZsHHWxysSo/0y9D2K42SaB8Y/+aD2K42SaB8Y/+ahU+WOZsHcrxysooUeND'
-        url = 'https://ups.youku.com/ups/get.json?vid={}&ccode={}'.format(self.vid, ccode)
-        url += '&client_ip=192.168.1.1'
-        url += '&utid=' + utid
-        url += '&client_ts=' + str(int(time.time()))
-        url += '&ckey=' + urllib.parse.quote(ckey)
-        self.json_url = url
+        self.json_url = 'https://ups.youku.com/ups/get.json?vid=%s&ccode=0590&client_ip=0.0.0.0&client_ts=1543553721&utid=%s'%(self.vid,self.cna)
 
     @log
     def get_m3u8_url(self):
@@ -42,6 +31,7 @@ class videolink():
         api_meta = json.loads(data.text)
         if 'error' in  api_meta['data']:
             if '版权' in api_meta['data']['error']['note']:
+                # print("版权")
                 self.errcode = 1
             else :
                 self.errcode = 2
@@ -60,6 +50,7 @@ class videolink():
             #print(self.vid+str(self.cdn_url)+'?'*20)
             if len(self.tslinks)==0 :
                 #print('json:'+self.json_url)
+                print("m3u8空")
                 self.errcode = 3
                 return False
 
@@ -68,22 +59,16 @@ class videolink():
         self.fetch_cna()
         self.get_json_url()
         if self.get_m3u8_url() == False or self.get_video_url() == False:
-            #print(str(self.errcode)*100)
             return self.errcode
         return self.tslinks
 
     def rq(self,url):
         for i in range(3):
-            # print('-'*100)
-            # print(str(i)+': '+url)
             try:
                 response = requests.get(url=url,timeout=3)
                 return response
             except Exception as e:
                 print('rq'+str(e))
                 return False
-                #time.sleep(1)
 
-
-
-
+#x = videolink('XMzkyMTk1NzQ0MA')
