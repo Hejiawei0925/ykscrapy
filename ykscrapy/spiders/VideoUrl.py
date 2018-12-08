@@ -23,7 +23,7 @@ class videolink():
 
     @log
     def get_json_url(self):
-        self.json_url = 'https://ups.youku.com/ups/get.json?vid=%s&ccode=0590&client_ip=0.0.0.0&client_ts=1543553721&utid=%s'%(self.vid,self.cna)
+        self.json_url = 'https://ups.youku.com/ups/get.json?vid=%s&ccode=0405&client_ip=0.0.0.0&client_ts=1543553721&utid=%s'%(self.vid,self.cna)
 
     @log
     def get_m3u8_url(self):
@@ -49,7 +49,7 @@ class videolink():
             self.tslinks = [('http:'+link).strip() for link in tslinks]
             #print(self.vid+str(self.cdn_url)+'?'*20)
             if len(self.tslinks)==0 :
-                #print('json:'+self.json_url)
+                print('json:'+self.json_url)
                 print("m3u8空")
                 self.errcode = 3
                 return False
