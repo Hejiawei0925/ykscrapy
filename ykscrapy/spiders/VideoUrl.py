@@ -23,6 +23,7 @@ class videolink():
 
     @log
     def get_json_url(self):
+        #获取json地址
         self.json_url = 'https://ups.youku.com/ups/get.json?vid=%s&ccode=0405&client_ip=0.0.0.0&client_ts=1543553721&utid=%s'%(self.vid,self.cna)
 
     @log
